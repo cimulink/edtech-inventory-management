@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EdTech Inventory Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+        }
+        .modal-backdrop {
+            background-color: rgba(0,0,0,0.5);
+        }
+        .card {
+            background: linear-gradient(to bottom, rgba(79, 70, 229, 0.05) 0%, transparent 100%);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+        }
+        .nav-link.active {
+            background-color: rgba(79, 70, 229, 0.9);
+            color: white;
+        }
+        .chart-container {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar fixed md:relative z-20 w-64 bg-gray-900 text-white flex-shrink-0 flex-col">
+            <div class="p-4 border-b border-gray-800 flex justify-center items-center">
+                <img src="images/cellsius-logo.png" alt="Cellsius Logo" class="h-12 bg-white p-2 rounded-lg shadow-sm">
+            </div>
+            <nav class="flex-1 p-2 space-y-1">
+                <a href="#" data-page="dashboard" class="nav-link flex items-center p-3 rounded-lg bg-indigo-600 text-white">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    Dashboard
+                </a>
+                <a href="#" data-page="inventory" class="nav-link flex items-center p-3 rounded-lg hover:bg-gray-800 text-gray-300 hover:text-white">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                    Inventory
+                </a>
+                <a href="#" data-page="orders" class="nav-link flex items-center p-3 rounded-lg hover:bg-gray-800 text-gray-300 hover:text-white">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                    Orders
+                </a>
+                <a href="#" data-page="batches" class="nav-link flex items-center p-3 rounded-lg hover:bg-gray-800 text-gray-300 hover:text-white">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    Student Batches
+                </a>
+                <a href="#" data-page="reports" class="nav-link flex items-center p-3 rounded-lg hover:bg-gray-800 text-gray-300 hover:text-white">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    Reports
+                </a>
+                <a href="#" data-page="forecasting" class="nav-link flex items-center p-3 rounded-lg hover:bg-gray-800 text-gray-300 hover:text-white">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                    Forecasting
+                </a>
+                <a href="#" data-page="returns" class="nav-link flex items-center p-3 rounded-lg hover:bg-gray-800 text-gray-300 hover:text-white">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m6 14h2a2 2 0 002-2V7a2 2 0 00-2-2h-2"></path></svg>
+                    Returns (RMA)
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="bg-white border-b border-gray-200 p-4 flex justify-between items-center">
+                <div class="flex items-center">
+                    <button id="menu-toggle" class="md:hidden text-gray-600 mr-3">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    </button>
+                    <h1 id="page-title" class="text-xl font-semibold text-gray-800">Dashboard</h1>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                    </button>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white font-medium text-sm">AJ</div>
+                        <span class="hidden sm:inline text-sm font-medium text-gray-700">Admin</span>
+                    </div>
+                </div>
+            </header>
+            
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4 md:p-6">
+                <div id="app-content"></div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modals Container -->
+    <div id="modals-container"></div>
+
+<script type="module">
+const App = {
+    // --- STATE & DUMMY DATA ---
+    state: {
+        currentPage: 'dashboard',
+        books: [
+            { id: 1, sku: 'PHY-001', title: 'Concepts of Physics - Vol 1', stock: 150, reorderLevel: 50, warehouseId: 1 },
+            { id: 2, sku: 'PHY-002', title: 'Concepts of Physics - Vol 2', stock: 35, reorderLevel: 50, warehouseId: 1 },
+            { id: 3, sku: 'CHE-001', title: 'Organic Chemistry', stock: 200, reorderLevel: 75, warehouseId: 2 },
+            { id: 4, sku: 'MAT-001', title: 'Mathematics for JEE', stock: 80, reorderLevel: 40, warehouseId: 2 },
+            { id: 5, sku: 'BIO-001', title: 'Biology for NEET', stock: 120, reorderLevel: 60, warehouseId: 1 },
+            { id: 6, sku: 'CHE-002', title: 'Inorganic Chemistry', stock: 10, reorderLevel: 30, warehouseId: 2 },
+        ],
+        warehouses: [ { id: 1, name: 'Mumbai Warehouse' }, { id: 2, name: 'Delhi Warehouse' } ],
+        purchaseOrders: [
+            { id: 1, items: [{bookId: 2, quantity: 200}], received: [{bookId: 2, quantity: 100}], status: 'Partially Received', supplier: 'Alpha Prints', date: '2025-08-15' },
+            { id: 2, items: [{bookId: 6, quantity: 150}, {bookId: 5, quantity: 100}], received: [], status: 'Pending', supplier: 'Beta Publishers', date: '2025-08-20' },
+            { id: 3, items: [{bookId: 3, quantity: 100}], received: [{bookId: 3, quantity: 100}], status: 'Completed', supplier: 'Alpha Prints', date: '2025-08-10' },
+        ],
+        salesOrders: [],
+        bookSets: [
+            { id: 1, name: 'JEE Foundation Set', bookIds: [1, 3, 4] },
+            { id: 2, name: 'NEET Ultimate Pack', bookIds: [1, 5, 6] },
+        ],
+        studentBatches: [
+            { id: 1, name: 'NEET 2025 Weekend Batch', bookSetId: 2 },
+            { id: 2, name: 'JEE 2026 Morning Batch', bookSetId: 1 },
+            { id: 3, name: 'NEET 2025 Crash Course', bookSetId: 2 },
+        ],
+        dailySales: [],
+        chartInstance: null,
+        dailySalesChartInstance: null,
+    },
+
+    // --- INITIALIZATION ---
+    init() {
+        this.generateSalesData();
+        this.cacheDOMElements();
+        this.registerEventListeners();
+        this.render();
+    },
+
+    generateSalesData() {
+        const today = new Date();
+        for (let i = 0; i < 30; i++) {
+            const date = new Date();
+            date.setDate(today.getDate() - i);
+            const dateString = date.toISOString().split('T')[0];
+            this.state.books.forEach(book => {
+                if (Math.random() > 0.3) {
+                    const quantity = Math.floor(Math.random() * (book.id === 5 ? 15 : 8)) + 1;
+                    const channels = ['Amazon', 'Flipkart', 'Own App', 'Bulk'];
+                    const channel = channels[Math.floor(Math.random() * channels.length)];
+                    this.state.dailySales.push({ date: dateString, bookId: book.id, quantity, channel });
+                }
+            });
+        }
+    },
+
+    cacheDOMElements() {
+        this.dom = {
+            content: document.getElementById('app-content'),
+            pageTitle: document.getElementById('page-title'),
+            navLinks: document.querySelectorAll('.nav-link'),
+            menuToggle: document.getElementById('menu-toggle'),
+            sidebar: document.getElementById('sidebar'),
+            modalsContainer: document.getElementById('modals-container'),
+        };
+    },
+
+    registerEventListeners() {
+        this.dom.sidebar.addEventListener('click', (e) => {
+            const link = e.target.closest('.nav-link');
+            if (link) {
+                e.preventDefault();
+                this.state.currentPage = link.dataset.page;
+                this.render();
+                if (window.innerWidth < 768) this.dom.sidebar.classList.remove('open');
+            }
+        });
+        this.dom.menuToggle.addEventListener('click', () => this.dom.sidebar.classList.toggle('open'));
+    },
+
+    // --- RENDER LOGIC ---
+    render() {
+        const page = this.state.currentPage;
+        this.updateActiveNavLink(page);
+        this.dom.pageTitle.textContent = page.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        this.renderModals();
+
+        const renderMap = {
+            'dashboard': this.renderDashboard,
+            'inventory': this.renderInventory,
+            'orders': this.renderOrders,
+            'batches': this.renderStudentBatches,
+            'reports': this.renderReports,
+            'forecasting': this.renderForecasting,
+            'returns': this.renderReturns,
+        };
+        (renderMap[page] || this.renderDashboard).call(this);
+    },
+    
+    renderModals() {
+        this.dom.modalsContainer.innerHTML = `
+            ${this.getAddBookModalHTML()}
+            ${this.getCreateSalesOrderModalHTML()}
+        `;
+        document.getElementById('addBookForm')?.addEventListener('submit', (e) => this.handleAddNewBook(e));
+        document.getElementById('cancelAddBook')?.addEventListener('click', () => this.toggleModal('addBookModal', false));
+        document.getElementById('createSalesOrderForm')?.addEventListener('submit', (e) => this.handleCreateSalesOrder(e));
+        document.getElementById('cancelCreateSalesOrder')?.addEventListener('click', () => this.toggleModal('createSalesOrderModal', false));
+        document.getElementById('addOrderItem')?.addEventListener('click', () => this.addOrderItemRow());
+    },
+
+    updateActiveNavLink(page) {
+        this.dom.sidebar.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.toggle('bg-gray-700', link.dataset.page === page)
+        });
+    },
+
+    // --- PAGE RENDERERS ---
+    renderDashboard() {
+        const totalStock = this.state.books.reduce((sum, book) => sum + book.stock, 0);
+        const lowStockItems = this.state.books.filter(b => b.stock <= b.reorderLevel).length;
+        const salesToday = this.getSalesForDate(new Date().toISOString().split('T')[0]);
+        const totalSalesToday = salesToday.reduce((sum, sale) => sum + sale.quantity, 0);
+        const salesByBook = salesToday.reduce((acc, sale) => {
+            acc[sale.bookId] = (acc[sale.bookId] || 0) + sale.quantity; return acc;
+        }, {});
+        const topSellerId = Object.keys(salesByBook).sort((a,b) => salesByBook[b] - salesByBook[a])[0];
+        const topSeller = topSellerId ? this.state.books.find(b => b.id == topSellerId) : { title: 'N/A' };
+
+        // Get last 7 days of sales data for the chart
+        const last7Days = [];
+        const salesByDate = {};
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            const dateString = date.toISOString().split('T')[0];
+            last7Days.push(dateString);
+            salesByDate[dateString] = this.state.dailySales.filter(s => s.date === dateString).reduce((sum, s) => sum + s.quantity, 0);
+        }
+
+        this.dom.content.innerHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="card p-6 rounded-lg">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Total Inventory</p>
+                            <p class="text-3xl font-bold text-gray-900 mt-2">${totalStock.toLocaleString()}</p>
+                        </div>
+                        <div class="p-3 rounded-lg bg-indigo-100">
+                            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="card p-6 rounded-lg">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Low Stock Items</p>
+                            <p class="text-3xl font-bold text-red-600 mt-2">${lowStockItems}</p>
+                        </div>
+                        <div class="p-3 rounded-lg bg-red-100">
+                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="card p-6 rounded-lg">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Units Sold Today</p>
+                            <p class="text-3xl font-bold text-gray-900 mt-2">${totalSalesToday}</p>
+                        </div>
+                        <div class="p-3 rounded-lg bg-green-100">
+                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="card p-6 rounded-lg">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Top Seller Today</p>
+                            <p class="text-xl font-bold text-indigo-600 mt-2 truncate">${topSeller.title}</p>
+                        </div>
+                        <div class="p-3 rounded-lg bg-indigo-100">
+                            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 card rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">Daily Sales Trend (Last 7 Days)</h3>
+                </div>
+                <div class="p-6">
+                    <canvas id="dailySalesChart" height="300"></canvas>
+                </div>
+            </div>
+            <div class="mt-8 card p-6 rounded-lg">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900">Quick Stock Overview</h3>
+                    <button class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">View All</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-200">
+                                <th class="pb-3 text-left text-sm font-semibold text-gray-600">Book Title</th>
+                                <th class="pb-3 text-left text-sm font-semibold text-gray-600">Stock</th>
+                                <th class="pb-3 text-left text-sm font-semibold text-gray-600">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            ${this.state.books.slice(0, 5).map(book => `
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-4 text-sm font-medium text-gray-900">${book.title}</td>
+                                    <td class="py-4 text-sm text-gray-600">${book.stock}</td>
+                                    <td class="py-4">${this.getStockStatus(book)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>`;
+
+        // Initialize the daily sales chart
+        this.initDailySalesChart(last7Days, salesByDate);
+    },
+
+    renderInventory() {
+        this.dom.content.innerHTML = `
+            <div class="bg-white p-4 rounded-lg shadow mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <input type="text" id="bookSearch" placeholder="Search by book title or SKU..." class="p-2 border rounded-md">
+                    <select id="statusFilter" class="p-2 border rounded-md"><option value="all">All Statuses</option><option value="in-stock">In Stock</option><option value="low-stock">Low Stock</option><option value="out-of-stock">Out of Stock</option></select>
+                    <button id="addNewBookBtn" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 w-full md:w-auto md:ml-auto">Add New Book</button>
+                </div>
+            </div>
+            <div id="inventoryTableContainer" class="bg-white rounded-lg shadow overflow-x-auto"></div>`;
+        this.renderInventoryTable();
+        document.getElementById('addNewBookBtn').addEventListener('click', () => this.toggleModal('addBookModal', true));
+        document.getElementById('bookSearch').addEventListener('input', () => this.renderInventoryTable());
+        document.getElementById('statusFilter').addEventListener('change', () => this.renderInventoryTable());
+    },
+
+    renderInventoryTable() {
+        const searchTerm = document.getElementById('bookSearch')?.value.toLowerCase() || '';
+        const statusFilter = document.getElementById('statusFilter')?.value || 'all';
+        const filteredBooks = this.state.books.filter(book => {
+            const matchesSearch = book.title.toLowerCase().includes(searchTerm) || book.sku.toLowerCase().includes(searchTerm);
+            if (statusFilter === 'all') return matchesSearch;
+            return matchesSearch && this.getBookStatusValue(book) === statusFilter;
+        });
+        const tableContainer = document.getElementById('inventoryTableContainer');
+        if (!tableContainer) return;
+        tableContainer.innerHTML = `
+            <div class="rounded-lg border border-gray-200">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reorder Level</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Warehouse</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        ${filteredBooks.map(book => `
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${book.sku}</td>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900">${book.title}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${book.stock}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${book.reorderLevel}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${this.state.warehouses.find(w => w.id === book.warehouseId).name}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">${this.getStockStatus(book)}</td>
+                            </tr>
+                        `).join('') || `
+                            <tr>
+                                <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
+                                    <div class="flex flex-col items-center justify-center py-12">
+                                        <svg class="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        <p>No books found matching your criteria</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        `}
+                    </tbody>
+                </table>
+            </div>`;
+    },
+    
+    renderOrders() {
+        this.dom.content.innerHTML = `
+            <div class="flex justify-between items-center mb-6">
+                 <h2 class="text-2xl font-semibold text-gray-900">Sales & Purchase Orders</h2>
+                 <button id="createNewSalesOrderBtn" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Create New Sales Order</button>
+            </div>
+            <div class="space-y-8">
+                <div class="card rounded-lg">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-900">Recent Sales Orders</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <div class="rounded-lg border border-gray-200">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer/Channel</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Qty</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    ${this.state.salesOrders.map(order => `
+                                        <tr class="hover:bg-gray-50">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">SO-${String(order.id).padStart(4, '0')}</td>
+                                            <td class="px-6 py-4 text-sm font-medium text-gray-900">${order.customer}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${order.date}</td>
+                                            <td class="px-6 py-4 text-sm text-gray-600">
+                                                ${order.items.map(item => `${this.state.books.find(b => b.id == item.bookId).title} (x${item.quantity})`).join('<br>')}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${order.items.reduce((sum, i) => sum + i.quantity, 0)}</td>
+                                        </tr>
+                                    `).join('') || `
+                                        <tr>
+                                            <td colspan="5" class="px-6 py-12 text-center text-sm text-gray-500">
+                                                <div class="flex flex-col items-center justify-center">
+                                                    <svg class="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                                                    <p>No sales orders created yet</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    `}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="card rounded-lg">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-900">Purchase Orders (from Suppliers)</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <div class="rounded-lg border border-gray-200">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PO ID</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Supplier</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    ${this.state.purchaseOrders.map(po => `
+                                        <tr class="hover:bg-gray-50">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">PO-${String(po.id).padStart(4, '0')}</td>
+                                            <td class="px-6 py-4 text-sm font-medium text-gray-900">${po.supplier}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${po.date}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="px-2 py-1 text-xs font-medium rounded-full ${po.status === 'Completed' ? 'bg-green-100 text-green-800' : po.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800'}">
+                                                    ${po.status}
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                ${po.status !== 'Completed' ? `
+                                                    <button data-po-id="${po.id}" class="receive-stock-btn px-3 py-1 bg-green-500 text-white text-sm rounded-md hover:bg-green-600">
+                                                        Receive Stock
+                                                    </button>
+                                                ` : `
+                                                    <span class="text-gray-400 text-sm">Completed</span>
+                                                `}
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        document.getElementById('createNewSalesOrderBtn').addEventListener('click', () => this.toggleModal('createSalesOrderModal', true));
+        document.querySelectorAll('.receive-stock-btn').forEach(btn => btn.addEventListener('click', (e) => this.handleReceiveStock(e.currentTarget.dataset.poId)));
+    },
+    
+    renderStudentBatches() {
+        this.dom.content.innerHTML = `
+            <div class="bg-white p-4 rounded-lg shadow mb-6">
+                <div class="flex items-center">
+                    <input type="text" id="batchSearch" placeholder="Search by batch name..." class="flex-1 p-2 border rounded-md">
+                    <button class="ml-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </button>
+                </div>
+            </div>
+            <div id="batchesContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>`;
+        this.renderBatchesList();
+        document.getElementById('batchSearch').addEventListener('input', () => this.renderBatchesList());
+    },
+
+    renderBatchesList() {
+        const searchTerm = document.getElementById('batchSearch')?.value.toLowerCase() || '';
+        const filteredBatches = this.state.studentBatches.filter(b => b.name.toLowerCase().includes(searchTerm));
+        const container = document.getElementById('batchesContainer');
+        if (!container) return;
+        container.innerHTML = `
+            <div class="card rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">Book Sets</h3>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4">
+                        ${this.state.bookSets.map(set => `
+                            <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                                <h4 class="font-semibold text-gray-900 mb-2">${set.name}</h4>
+                                <ul class="space-y-1">
+                                    ${set.bookIds.map(id => `
+                                        <li class="flex items-center text-sm text-gray-600">
+                                            <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                            ${this.state.books.find(b => b.id === id).title}
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+            <div class="card rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">Batch Assignments</h3>
+                </div>
+                <div class="p-6">
+                    ${filteredBatches.length > 0 ? `
+                        <div class="space-y-4">
+                            ${filteredBatches.map(batch => `
+                                <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                                    <div class="flex items-center justify-between">
+                                        <h4 class="font-semibold text-gray-900">${batch.name}</h4>
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full bg-indigo-100 text-indigo-800">
+                                            ${this.state.bookSets.find(s => s.id === batch.bookSetId).name}
+                                        </span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mt-2">Book Set Assignment</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : `
+                        <div class="flex flex-col items-center justify-center py-12 text-center">
+                            <svg class="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                            <p class="text-gray-500">No batches found matching your search</p>
+                        </div>
+                    `}
+                </div>
+            </div>`;
+    },
+    
+    renderReports() {
+        const today = new Date().toISOString().split('T')[0];
+        const sevenDaysAgo = new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        this.dom.content.innerHTML = `
+            <div class="card rounded-lg mb-6">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">Report Filters</h3>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                            <input type="date" id="startDate" value="${sevenDaysAgo}" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                            <input type="date" id="endDate" value="${today}" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div class="flex space-x-2">
+                            <button id="filterToday" class="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm font-medium">Today</button>
+                            <button id="filter7Days" class="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm font-medium">7 Days</button>
+                        </div>
+                        <button id="applyFilter" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-medium">Apply Filter</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card rounded-lg mb-6">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">Sales Chart</h3>
+                </div>
+                <div class="p-6">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+            <div class="card rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-semibold text-gray-900">Sales Log</h3>
+                        <button class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">Export Data</button>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div id="salesLogContainer" class="overflow-x-auto"></div>
+                </div>
+            </div>`;
+        this.updateReportView();
+        document.getElementById('applyFilter').addEventListener('click', () => this.updateReportView());
+        document.getElementById('filterToday').addEventListener('click', () => {
+            const todayStr = new Date().toISOString().split('T')[0];
+            document.getElementById('startDate').value = todayStr; document.getElementById('endDate').value = todayStr; this.updateReportView();
+        });
+        document.getElementById('filter7Days').addEventListener('click', () => {
+             const todayStr = new Date().toISOString().split('T')[0];
+             const sevenDaysAgoStr = new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+             document.getElementById('startDate').value = sevenDaysAgoStr; document.getElementById('endDate').value = todayStr; this.updateReportView();
+        });
+    },
+
+    updateReportView() {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        const salesData = this.getSalesForDateRange(startDate, endDate);
+        this.renderSalesLog(salesData);
+        this.initChart(salesData);
+    },
+
+    renderSalesLog(salesData) {
+        const container = document.getElementById('salesLogContainer');
+        container.innerHTML = `
+            <div class="rounded-lg border border-gray-200">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Book Title</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Channel</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        ${salesData.map(sale => `
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${sale.date}</td>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900">${this.state.books.find(b => b.id === sale.bookId).title}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${sale.quantity}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${sale.channel}</td>
+                            </tr>
+                        `).join('') || `
+                            <tr>
+                                <td colspan="4" class="px-6 py-12 text-center text-sm text-gray-500">
+                                    <div class="flex flex-col items-center justify-center">
+                                        <svg class="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                                        <p>No sales data found for the selected date range</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        `}
+                    </tbody>
+                </table>
+            </div>`;
+    },
+
+    renderForecasting() {
+        const forecastData = this.state.books.map(book => {
+            const salesLast30Days = this.state.dailySales.filter(s => s.bookId === book.id).reduce((sum, s) => sum + s.quantity, 0);
+            const avgDailySales = (salesLast30Days / 30).toFixed(2);
+            const daysOfStockLeft = avgDailySales > 0 ? Math.floor(book.stock / avgDailySales) : Infinity;
+            const needsReorder = daysOfStockLeft < 15;
+            const suggestedOrder = needsReorder ? Math.max(0, Math.ceil((30 * avgDailySales) - book.stock)) : 0;
+            return { ...book, avgDailySales, daysOfStockLeft, needsReorder, suggestedOrder };
+        }).sort((a, b) => a.daysOfStockLeft - b.daysOfStockLeft);
+
+        this.dom.content.innerHTML = `
+            <div class="card rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">Reorder Suggestions</h3>
+                            <p class="text-sm text-gray-500 mt-1">Based on average sales over last 30 days. Suggestions trigger when stock is below a 15-day supply.</p>
+                        </div>
+                        <button class="px-3 py-1 text-sm bg-indigo-100 text-indigo-700 rounded-md hover:bg-indigo-200 font-medium">
+                            Refresh Data
+                        </button>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="overflow-x-auto">
+                        <div class="rounded-lg border border-gray-200">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Book Title</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Stock</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Daily Sales</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Days of Stock Left</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Suggested Order Qty</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    ${forecastData.map(item => `
+                                        <tr class="hover:bg-gray-50 ${item.needsReorder ? 'bg-yellow-50' : ''}">
+                                            <td class="px-6 py-4 text-sm font-medium text-gray-900">${item.title}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${item.stock}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${item.avgDailySales}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold ${item.daysOfStockLeft < 15 ? 'text-red-600' : 'text-gray-900'}">
+                                                ${isFinite(item.daysOfStockLeft) ? item.daysOfStockLeft : 'N/A'}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-indigo-600">
+                                                ${item.suggestedOrder > 0 ? item.suggestedOrder : '—'}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                ${item.suggestedOrder > 0 ? `
+                                                    <button class="px-3 py-1 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700">
+                                                        Create PO
+                                                    </button>
+                                                ` : `
+                                                    <span class="text-gray-400 text-sm">—</span>
+                                                `}
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+    },
+
+    renderReturns() {
+        this.dom.content.innerHTML = `
+            <div class="card rounded-lg max-w-2xl mx-auto">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">Process a Return (RMA)</h3>
+                </div>
+                <div class="p-6">
+                    <form id="returnForm" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="returnSku" class="block text-sm font-medium text-gray-700 mb-1">Book SKU</label>
+                                <input type="text" id="returnSku" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., PHY-001" required>
+                                <p class="mt-1 text-xs text-gray-500">Enter the SKU of the book being returned</p>
+                            </div>
+                            <div>
+                                <label for="returnQuantity" class="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+                                <input type="number" id="returnQuantity" value="1" min="1" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
+                                <p class="mt-1 text-xs text-gray-500">Number of units being returned</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4 pt-4">
+                            <button type="submit" class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-medium">Process Return</button>
+                            <button type="button" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 font-medium">Cancel</button>
+                        </div>
+                    </form>
+                    <div id="returnMessage" class="mt-6"></div>
+                </div>
+            </div>`;
+        document.getElementById('returnForm').addEventListener('submit', (e) => this.handleReturn(e));
+    },
+
+    // --- MODAL HTML GETTERS ---
+    getAddBookModalHTML() {
+        return `
+            <div id="addBookModal" class="fixed inset-0 z-30 hidden items-center justify-center modal-backdrop">
+                <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+                    <h2 class="text-xl font-bold mb-4">Add New Book</h2>
+                    <form id="addBookForm">
+                        <div class="mb-4"><label for="bookTitle" class="block text-sm font-medium text-gray-700">Book Title</label><input type="text" id="bookTitle" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required></div>
+                        <div class="mb-4"><label for="bookSku" class="block text-sm font-medium text-gray-700">SKU</label><input type="text" id="bookSku" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required></div>
+                        <div class="mb-4"><label for="bookStock" class="block text-sm font-medium text-gray-700">Initial Stock</label><input type="number" id="bookStock" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required></div>
+                        <div class="mb-4"><label for="bookReorder" class="block text-sm font-medium text-gray-700">Reorder Level</label><input type="number" id="bookReorder" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required></div>
+                        <div class="flex justify-end space-x-2"><button type="button" id="cancelAddBook" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Cancel</button><button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Add Book</button></div>
+                    </form>
+                </div>
+            </div>`;
+    },
+
+    getCreateSalesOrderModalHTML() {
+        const bookOptions = this.state.books.map(b => `<option value="${b.id}">${b.title} (Stock: ${b.stock})</option>`).join('');
+        return `
+            <div id="createSalesOrderModal" class="fixed inset-0 z-30 hidden items-center justify-center modal-backdrop">
+                <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl">
+                    <h2 class="text-xl font-bold mb-4">Create New Sales Order</h2>
+                    <form id="createSalesOrderForm">
+                        <div class="mb-4"><label for="customerName" class="block text-sm font-medium text-gray-700">Customer / Channel</label><input type="text" id="customerName" placeholder="e.g., Bulk Sale - ABC Corp" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required></div>
+                        <div id="orderItemsContainer" class="space-y-3 mb-4"></div>
+                        <div class="flex justify-between items-center">
+                            <button type="button" id="addOrderItem" class="px-4 py-2 bg-green-500 text-white text-sm rounded-md hover:bg-green-600">Add Book</button>
+                            <div class="flex justify-end space-x-2">
+                                <button type="button" id="cancelCreateSalesOrder" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Cancel</button>
+                                <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Create Order</button>
+                            </div>
+                        </div>
+                        <div id="orderError" class="text-red-500 text-sm mt-4"></div>
+                    </form>
+                </div>
+            </div>`;
+    },
+
+    // --- HELPERS & HANDLERS ---
+    addOrderItemRow() {
+        const container = document.getElementById('orderItemsContainer');
+        const bookOptions = this.state.books.map(b => `<option value="${b.id}">${b.title} (Stock: ${b.stock})</option>`).join('');
+        const row = document.createElement('div');
+        row.className = 'grid grid-cols-12 gap-2 items-center order-item-row';
+        row.innerHTML = `
+            <select class="col-span-7 p-2 border rounded-md order-book-select">${bookOptions}</select>
+            <input type="number" value="1" min="1" class="col-span-3 p-2 border rounded-md order-quantity-input">
+            <button type="button" class="col-span-2 remove-order-item-btn px-2 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">X</button>
+        `;
+        container.appendChild(row);
+        row.querySelector('.remove-order-item-btn').addEventListener('click', () => row.remove());
+    },
+
+    getBookStatusValue(book) {
+        if (book.stock <= 0) return 'out-of-stock';
+        if (book.stock <= book.reorderLevel) return 'low-stock';
+        return 'in-stock';
+    },
+
+    getStockStatus(book) {
+        const statusMap = {
+            'out-of-stock': `<span class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">Out of Stock</span>`,
+            'low-stock': `<span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">Low Stock</span>`,
+            'in-stock': `<span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">In Stock</span>`,
+        };
+        return statusMap[this.getBookStatusValue(book)];
+    },
+    
+    toggleModal(modalId, show) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.toggle('hidden', !show);
+            modal.classList.toggle('flex', show);
+            if (modalId === 'createSalesOrderModal' && show) {
+                document.getElementById('orderItemsContainer').innerHTML = '';
+                this.addOrderItemRow();
+                document.getElementById('orderError').textContent = '';
+            }
+        }
+    },
+
+    handleAddNewBook(event) {
+        event.preventDefault();
+        const newBook = {
+            id: Math.max(0, ...this.state.books.map(b => b.id)) + 1,
+            title: document.getElementById('bookTitle').value, sku: document.getElementById('bookSku').value,
+            stock: parseInt(document.getElementById('bookStock').value), reorderLevel: parseInt(document.getElementById('bookReorder').value),
+            warehouseId: 1,
+        };
+        this.state.books.push(newBook);
+        this.toggleModal('addBookModal', false);
+        document.getElementById('addBookForm').reset();
+        this.render();
+    },
+    
+    handleCreateSalesOrder(event) {
+        event.preventDefault();
+        const customer = document.getElementById('customerName').value;
+        const itemRows = document.querySelectorAll('.order-item-row');
+        const errorEl = document.getElementById('orderError');
+        errorEl.textContent = '';
+        
+        const items = [];
+        for (const row of itemRows) {
+            const bookId = parseInt(row.querySelector('select').value);
+            const quantity = parseInt(row.querySelector('input').value);
+            const book = this.state.books.find(b => b.id === bookId);
+            if (quantity > book.stock) {
+                errorEl.textContent = `Error: Not enough stock for "${book.title}". Requested: ${quantity}, Available: ${book.stock}.`;
+                return;
+            }
+            items.push({ bookId, quantity });
+        }
+
+        const today = new Date().toISOString().split('T')[0];
+        items.forEach(item => {
+            const book = this.state.books.find(b => b.id === item.bookId);
+            book.stock -= item.quantity;
+            this.state.dailySales.push({ date: today, bookId: item.bookId, quantity: item.quantity, channel: customer });
+        });
+
+        const newOrder = {
+            id: Math.max(0, ...this.state.salesOrders.map(o => o.id)) + 1,
+            customer, items, date: today,
+        };
+        this.state.salesOrders.push(newOrder);
+
+        this.toggleModal('createSalesOrderModal', false);
+        this.render();
+    },
+
+    handleReceiveStock(poId) {
+        const po = this.state.purchaseOrders.find(p => p.id == poId);
+        if (!po || po.status === 'Completed') return;
+        
+        const firstItem = po.items[0];
+        const book = this.state.books.find(b => b.id === firstItem.bookId);
+        const totalReceived = po.received.reduce((sum, item) => sum + (item.bookId === firstItem.bookId ? item.quantity : 0), 0);
+        const remaining = firstItem.quantity - totalReceived;
+
+        const amountToReceive = prompt(`How many units of "${book.title}" are you receiving? (Remaining: ${remaining})`, remaining);
+        if (amountToReceive === null || isNaN(amountToReceive) || amountToReceive <= 0) return;
+        
+        const receivedQty = parseInt(amountToReceive);
+        po.received.push({ bookId: firstItem.bookId, quantity: receivedQty });
+        book.stock += receivedQty;
+
+        const newTotalReceived = totalReceived + receivedQty;
+        if (newTotalReceived >= firstItem.quantity) {
+            po.status = 'Completed';
+        } else {
+            po.status = 'Partially Received';
+        }
+        this.render();
+    },
+    
+    handleReturn(event) {
+        event.preventDefault();
+        const sku = document.getElementById('returnSku').value.trim().toUpperCase();
+        const quantity = parseInt(document.getElementById('returnQuantity').value);
+        const messageEl = document.getElementById('returnMessage');
+        const book = this.state.books.find(b => b.sku.toUpperCase() === sku);
+        if (book) {
+            book.stock += quantity;
+            messageEl.innerHTML = `<p class="text-green-600">Successfully returned ${quantity} unit(s) of "${book.title}". New stock is ${book.stock}.</p>`;
+            event.target.reset();
+        } else {
+            messageEl.innerHTML = `<p class="text-red-600">Error: SKU "${sku}" not found.</p>`;
+        }
+    },
+
+    getSalesForDate(date) {
+        return this.state.dailySales.filter(s => s.date === date);
+    },
+
+    getSalesForDateRange(startDate, endDate) {
+        return this.state.dailySales.filter(s => s.date >= startDate && s.date <= endDate);
+    },
+
+    initChart(salesData) {
+        const ctx = document.getElementById('salesChart')?.getContext('2d');
+        if (!ctx) return;
+        const salesByBook = salesData.reduce((acc, sale) => {
+            const bookTitle = this.state.books.find(b => b.id === sale.bookId).title;
+            acc[bookTitle] = (acc[bookTitle] || 0) + sale.quantity;
+            return acc;
+        }, {});
+        const sortedSales = Object.entries(salesByBook).sort(([,a],[,b]) => b-a);
+        const labels = sortedSales.map(([title]) => title);
+        const data = sortedSales.map(([,quantity]) => quantity);
+        if (this.state.chartInstance) this.state.chartInstance.destroy();
+        this.state.chartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{ label: 'Units Sold', data: data, backgroundColor: 'rgba(79, 70, 229, 0.8)', borderColor: 'rgba(79, 70, 229, 1)', borderWidth: 1 }]
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
+        });
+    },
+
+    initDailySalesChart(dates, salesByDate) {
+        const ctx = document.getElementById('dailySalesChart')?.getContext('2d');
+        if (!ctx) return;
+        
+        // Format dates for display (e.g., "Aug 15")
+        const formattedDates = dates.map(date => {
+            const d = new Date(date);
+            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        });
+        
+        // Get sales values for each date
+        const salesData = dates.map(date => salesByDate[date] || 0);
+        
+        // Destroy existing chart if it exists
+        if (this.state.dailySalesChartInstance) {
+            this.state.dailySalesChartInstance.destroy();
+        }
+        
+        // Create new chart
+        this.state.dailySalesChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: formattedDates,
+                datasets: [{
+                    label: 'Units Sold',
+                    data: salesData,
+                    borderColor: 'rgba(79, 70, 229, 1)',
+                    backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                    borderWidth: 2,
+                    pointBackgroundColor: 'rgba(79, 70, 229, 1)',
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        },
+                        ticks: {
+                            color: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(79, 70, 229, 0.9)',
+                        padding: 12,
+                        titleFont: {
+                            size: 14
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        callbacks: {
+                            label: function(context) {
+                                return `Units Sold: ${context.parsed.y}`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+};
+
+document.addEventListener('DOMContentLoaded', () => App.init());
+
+</script>
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cellsius: Smart Inventory System Proposal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Tailwind's gray-50 */
+        }
+        .section-title {
+            font-weight: 800;
+            font-size: 2.5rem;
+            line-height: 1.2;
+        }
+        .card {
+            background-color: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%; /* Make cards in a row equal height */
+            display: flex;
+            flex-direction: column;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .card-content {
+            flex-grow: 1;
+        }
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        .problem-tag {
+            background-color: #fee2e2; /* Red-100 */
+            color: #b91c1c; /* Red-700 */
+        }
+        .solution-tag {
+            background-color: #dcfce7; /* Green-100 */
+            color: #166534; /* Green-800 */
+        }
+        .screenshot {
+            border-radius: 0.75rem;
+            border: 1px solid #e5e7eb; /* Gray-200 */
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            overflow: hidden;
+            margin-top: auto; /* Pushes screenshot to the bottom */
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- Header Section -->
+    <header class="text-center py-16 px-4 bg-white">
+        <div class="max-w-4xl mx-auto">
+            <img src="images/cellsius-logo.png" alt="Cellsius Logo" class="mx-auto bg-white mb-10 h-17" onerror="this.onerror=null;this.src='https://placehold.co/150x50/6366f1/ffffff?text=Cellsius';">
+            <h1 class="section-title text-gray-900">
+                From <span class="text-red-500">Manual Chaos</span> to <span class="text-indigo-600">Automated Control</span>.
+            </h1>
+            <p class="mt-4 text-xl text-gray-600 max-w-2xl mx-auto">
+                A proposal to transform your book inventory management, save countless hours, and unlock data-driven growth.
+            </p>
+        </div>
+    </header>
+
+    <!-- Main Content: Paired Problem/Solution -->
+    <main class="py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto text-center mb-16">
+            <h2 class="text-3xl font-bold text-gray-800 tracking-tight">The Transformation, Side-by-Side</h2>
+            <p class="mt-3 text-lg text-gray-600">See how each challenge is directly solved by the new system.</p>
+        </div>
+
+        <div class="max-w-7xl mx-auto space-y-16">
+
+            <!-- PAIR 1: Manual Work vs Automation -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+                <!-- Problem Card 1 -->
+                <div class="card border-l-4 border-red-200">
+                    <div class="card-content">
+                        <span class="tag problem-tag">The Problem</span>
+                        <h3 class="mt-4 text-2xl font-bold">Everything is Manual & Slow</h3>
+                        <p class="mt-2 text-gray-600">
+                            You spend hours manually entering every sale from Flipkart, Amazon, and bulk orders into spreadsheets. This is slow, repetitive, and prone to human error.
+                        </p>
+                    </div>
+                </div>
+                <!-- Solution Card 1 -->
+                <div class="card border-l-4 border-indigo-200">
+                    <div class="card-content">
+                        <span class="tag solution-tag">The Solution</span>
+                        <h3 class="mt-4 text-2xl font-bold">Automate Your Workflow</h3>
+                        <p class="mt-2 mb-6 text-gray-600">
+                            The system connects to your sales channels. Orders automatically update your stock. This eliminates nearly all manual data entry, freeing up your team for valuable tasks.
+                        </p>
+                    </div>
+                    <div class="screenshot">
+                        <img src="images/orders.png" alt="Screenshot of the Orders dashboard" onerror="this.onerror=null;this.src='https://placehold.co/600x300/e0e7ff/4338ca?text=Orders+Dashboard';">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAIR 2: Stock Uncertainty vs Confident Reordering -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+                <!-- Problem Card 2 -->
+                <div class="card border-l-4 border-red-200">
+                    <div class="card-content">
+                        <span class="tag problem-tag">The Problem</span>
+                        <h3 class="mt-4 text-2xl font-bold">Stock Uncertainty & Guesswork</h3>
+                        <p class="mt-2 text-gray-600">
+                            Without a clear, real-time picture of your inventory, it's hard to know what's available. Reordering is based on guesswork, leading to lost sales or tied-up capital.
+                        </p>
+                    </div>
+                </div>
+                <!-- Solution Card 2 -->
+                <div class="card border-l-4 border-indigo-200">
+                    <div class="card-content">
+                        <span class="tag solution-tag">The Solution</span>
+                        <h3 class="mt-4 text-2xl font-bold">Reorder with Confidence</h3>
+                        <p class="mt-2 mb-6 text-gray-600">
+                            A live dashboard shows real-time stock levels and sales trends. It automatically alerts you when to reorder, preventing stockouts and overstocking.
+                        </p>
+                    </div>
+                    <div class="screenshot">
+                        <img src="images/forcasting.png" alt="Screenshot of the Forecasting dashboard" onerror="this.onerror=null;this.src='https://placehold.co/600x300/e0e7ff/4338ca?text=Forecasting+Dashboard';">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAIR 3: Resolving Doubts vs Complete Visibility -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+                <!-- Problem Card 3 -->
+                <div class="card border-l-4 border-red-200">
+                    <div class="card-content">
+                        <span class="tag problem-tag">The Problem</span>
+                        <h3 class="mt-4 text-2xl font-bold">Resolving Doubts is Difficult</h3>
+                        <p class="mt-2 text-gray-600">
+                            When a student has a query or a supplier sends a partial delivery, you lack a quick, reliable way to verify order details, leading to confusion and potential losses.
+                        </p>
+                    </div>
+                </div>
+                <!-- Solution Card 3 -->
+                <div class="card border-l-4 border-indigo-200">
+                    <div class="card-content">
+                        <span class="tag solution-tag">The Solution</span>
+                        <h3 class="mt-4 text-2xl font-bold">Gain Complete Visibility</h3>
+                        <p class="mt-2 mb-6 text-gray-600">
+                            View an end-to-end timeline for every single order. Instantly see the exact stage of any delivery, helping you resolve customer and supplier doubts with accuracy.
+                        </p>
+                    </div>
+                    <div class="screenshot">
+                        <img src="images/order-lifecycle.png" alt="Screenshot of the Order Lifecycle Details" onerror="this.onerror=null;this.src='https://placehold.co/600x400/e0e7ff/4338ca?text=Order+Timeline';">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PAIR 4: Manual Reporting vs Instant Reports -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+                <!-- Problem Card 4 -->
+                <div class="card border-l-4 border-red-200">
+                    <div class="card-content">
+                        <span class="tag problem-tag">The Problem</span>
+                        <h3 class="mt-4 text-2xl font-bold">Reporting is a Manual Chore</h3>
+                        <p class="mt-2 text-gray-600">
+                            Creating daily sales reports and checking closing stock is a time-consuming manual task that delays important business decisions.
+                        </p>
+                    </div>
+                </div>
+                <!-- Solution Card 4 -->
+                <div class="card border-l-4 border-indigo-200">
+                    <div class="card-content">
+                        <span class="tag solution-tag">The Solution</span>
+                        <h3 class="mt-4 text-2xl font-bold">Get Instant, Accurate Reports</h3>
+                        <p class="mt-2 mb-6 text-gray-600">
+                            See daily sales, top-selling books, and other key metrics instantly on a live dashboard. Make faster, data-driven decisions for your business with one click.
+                        </p>
+                    </div>
+                    <div class="screenshot">
+                        <img src="images/repoting.png" alt="Screenshot of the Reports dashboard" onerror="this.onerror=null;this.src='https://placehold.co/600x400/e0e7ff/4338ca?text=Live+Reports';">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+    
+    <!-- Footer CTA
+    <footer class="bg-indigo-700 text-white text-center py-16 px-4 mt-12">
+        <div class="max-w-2xl mx-auto">
+            <h2 class="text-3xl font-bold">Ready to take control of your inventory?</h2>
+            <p class="mt-4 text-indigo-200">Let's build the future of your inventory management together. This system is designed to grow with your business, with future enhancements for financial automation, a central command center, and deep business insights.</p>
+        </div>
+    </footer> -->
+
+</body>
+</html>
